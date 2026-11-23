@@ -18,7 +18,7 @@ function Hero() {
         </p>
 
         <h1>
-          Juan Moralez
+          Juan Matias Moralez
           <span>.</span>
         </h1>
 
@@ -43,7 +43,7 @@ function Hero() {
           </a>
 
           <a
-            href="https://github.com/TU_USUARIO"
+            href="https://github.com/Juan-Moralez"
             target="_blank"
             rel="noreferrer"
             className="btn-secondary"
