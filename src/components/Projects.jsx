@@ -6,10 +6,77 @@ const GITHUB_API = 'https://api.github.com';
 const GITHUB_USER = 'Juan-Moralez';
 const FEATURED_REPOSITORIES = new Set([
   'Juan-Moralez/programacion4Final',
-  'Juan-Moralez/ParcialProgramacion',
+  'Juan-Moralez/FinalProgramacion5',
   'DanielUrielMarquez/TallerCairoAutomotriz',
 ]);
-const ADDITIONAL_REPOSITORIES = ['DanielUrielMarquez/TallerCairoAutomotriz'];
+const ADDITIONAL_REPOSITORIES = [
+  {
+    full_name: 'DanielUrielMarquez/TallerCairoAutomotriz',
+    name: 'TallerCairoAutomotriz',
+    description: '',
+    html_url: 'https://github.com/DanielUrielMarquez/TallerCairoAutomotriz',
+    language: 'JavaScript',
+    stargazers_count: 0,
+    updated_at: '2026-03-08T23:08:57Z',
+    default_branch: 'main',
+    fork: false,
+    archived: false,
+  },
+];
+const FALLBACK_REPOSITORIES = [
+  {
+    full_name: 'Juan-Moralez/FInalProgramacion3',
+    name: 'FInalProgramacion3',
+    description:
+      'Final de la materia programación 3: sistema de gestión de reservas aéreas para Andes Air.',
+    html_url: 'https://github.com/Juan-Moralez/FInalProgramacion3',
+    language: 'Java',
+    stargazers_count: 0,
+    updated_at: '2026-11-23T21:53:21Z',
+    default_branch: 'main',
+    fork: false,
+    archived: false,
+  },
+  {
+    full_name: 'Juan-Moralez/juan-moralez.github.io',
+    name: 'juan-moralez.github.io',
+    description: 'Porfolio Personal',
+    html_url: 'https://github.com/Juan-Moralez/juan-moralez.github.io',
+    language: 'CSS',
+    stargazers_count: 0,
+    updated_at: '2026-11-22T19:05:55Z',
+    default_branch: 'main',
+    fork: false,
+    archived: false,
+  },
+  {
+    full_name: 'Juan-Moralez/FinalProgramacion5',
+    name: 'FinalProgramacion5',
+    description:
+      'Aplicación web SPA desarrollada con Angular para consultar países y gestionar viajes y favoritos.',
+    html_url: 'https://github.com/Juan-Moralez/FinalProgramacion5',
+    language: 'TypeScript',
+    stargazers_count: 0,
+    updated_at: '2026-11-23T22:02:43Z',
+    default_branch: 'main',
+    fork: false,
+    archived: false,
+  },
+  {
+    full_name: 'Juan-Moralez/programacion4Final',
+    name: 'programacion4Final',
+    description:
+      'Aplicación web para la gestión y venta online de mangas.',
+    html_url: 'https://github.com/Juan-Moralez/programacion4Final',
+    language: 'PHP',
+    stargazers_count: 0,
+    updated_at: '2026-11-23T22:09:37Z',
+    default_branch: 'main',
+    fork: false,
+    archived: false,
+  },
+  ...ADDITIONAL_REPOSITORIES,
+];
 let projectsRequest;
 
 async function fetchGitHubJson(path) {
@@ -27,7 +94,7 @@ async function fetchGitHubJson(path) {
 function isDocumentationFile(path) {
   const fileName = path.split('/').pop();
   const inDocumentationFolder =
-    /(^|\/)(docs?|documentacion|documentation)\//i.test(path);
+    /(^|\/)(docs?|documentacion|documentation|DOCUMENTACION)\//i.test(path);
   const isReadme = /^readme(?:\.[^/]+)?$/i.test(fileName);
   const isDocument = /\.(md|pdf|txt|docx?)$/i.test(fileName);
 
@@ -56,21 +123,30 @@ function loadProjects() {
 }
 
 async function fetchProjects() {
-  const ownRepositories = await fetchGitHubJson(
-    `/users/${GITHUB_USER}/repos?type=owner&per_page=100&sort=updated`,
-  );
-  const additionalRepositories = await Promise.all(
-    ADDITIONAL_REPOSITORIES.map((fullName) =>
-      fetchGitHubJson(`/repos/${fullName}`),
-    ),
-  );
+  let ownRepositories;
+
+  try {
+    ownRepositories = await fetchGitHubJson(
+      `/users/${GITHUB_USER}/repos?type=owner&per_page=100&sort=updated`,
+    );
+  } catch (error) {
+    return {
+      projects: FALLBACK_REPOSITORIES.map((repository) => ({
+        ...repository,
+        documentation: [],
+        documentationError: true,
+      })),
+      warning: `No se pudieron consultar los repositorios en GitHub: ${error.message} Se muestra una lista local mientras tanto.`,
+    };
+  }
+
   const repositoriesByName = new Map(
-    [...ownRepositories, ...additionalRepositories]
+    [...ownRepositories, ...ADDITIONAL_REPOSITORIES]
       .filter((repository) => !repository.fork && !repository.archived)
       .map((repository) => [repository.full_name, repository]),
   );
 
-  return Promise.all(
+  const projects = await Promise.all(
     [...repositoriesByName.values()]
       .sort((first, second) => {
         const firstFeatured = FEATURED_REPOSITORIES.has(first.full_name);
@@ -107,21 +183,25 @@ async function fetchProjects() {
         }
       }),
   );
+
+  return { projects, warning: '' };
 }
 
 function Projects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [warning, setWarning] = useState('');
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let active = true;
 
     loadProjects()
-      .then((loadedProjects) => {
+      .then((result) => {
         if (active) {
-          setProjects(loadedProjects);
+          setProjects(result.projects);
+          setWarning(result.warning);
         }
       })
       .catch((loadError) => {
@@ -139,6 +219,14 @@ function Projects() {
       active = false;
     };
   }, [attempt]);
+
+  function retryProjects() {
+    projectsRequest = undefined;
+    setLoading(true);
+    setError('');
+    setWarning('');
+    setAttempt((currentAttempt) => currentAttempt + 1);
+  }
 
   return (
     <section
@@ -166,11 +254,20 @@ function Projects() {
           <p>{error}</p>
           <button
             className="projects-retry"
-            onClick={() => {
-              setLoading(true);
-              setError('');
-              setAttempt((currentAttempt) => currentAttempt + 1);
-            }}
+            onClick={retryProjects}
+            type="button"
+          >
+            Reintentar
+          </button>
+        </div>
+      )}
+
+      {!loading && warning && (
+        <div className="projects-message" role="status">
+          <p>{warning}</p>
+          <button
+            className="projects-retry"
+            onClick={retryProjects}
             type="button"
           >
             Reintentar
