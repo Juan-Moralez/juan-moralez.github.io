@@ -1,0 +1,111 @@
+.contact {
+  padding-top: 70px;
+  padding-bottom: 90px;
+  scroll-margin-top: 90px;
+}
+
+.contact-heading {
+  max-width: 650px;
+  margin: 0 auto 34px;
+}
+
+.contact-eyebrow {
+  margin-bottom: 10px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.contact-heading h2 {
+  margin-bottom: 14px;
+  font-size: clamp(30px, 5vw, 42px);
+  letter-spacing: -1.5px;
+}
+
+.contact-intro {
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 16px;
+}
+
+.contact-card {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  text-align: left;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+
+.contact-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+}
+
+.contact-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.contact-card-content {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.contact-label {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.contact-value {
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.contact-cv {
+  display: inline-flex;
+  margin-top: 24px;
+  padding: 11px 18px;
+  border: 1px solid var(--accent);
+  border-radius: 7px;
+  background: var(--accent);
+  color: var(--bg-primary);
+  font-size: 14px;
+  font-weight: 600;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.contact-cv:hover {
+  background: transparent;
+  color: var(--accent);
+}
+
+@media (max-width: 650px) {
+  .contact {
+    padding-top: 40px;
+    padding-bottom: 70px;
+  }
+}

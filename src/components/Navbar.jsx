@@ -1,5 +1,6 @@
 
 import { BriefcaseBusiness, CodeXml } from 'lucide-react';
+import cvFile from '../assets/CVJuanMoralez.pdf_2026_5_5.pdf';
 import '../styles/Navbar.css';
 
 function Navbar() {
@@ -18,6 +19,9 @@ function Navbar() {
           <a href="#about">Sobre mí</a>
           <a href="#projects">Proyectos</a>
           <a href="#contact">Contacto</a>
+          <a className="navbar-cv" href={cvFile} download="CV-Juan-Moralez.pdf">
+            CV
+          </a>
         </div>
 
         <div className="navbar-socials">

@@ -44,6 +44,18 @@
   color: var(--accent);
 }
 
+.navbar-links .navbar-cv {
+  padding: 7px 12px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.navbar-links .navbar-cv:hover {
+  background: var(--accent-bg);
+}
+
 .navbar-socials {
   display: flex;
   gap: 18px;
